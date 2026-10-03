@@ -1,177 +1,823 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>One Tap Escape | Karthik Labs</title>
+  
+  <!-- SEO & Social Meta Tags -->
+  <title>One Tap Escape: Car Dodge | Official Game Page | Karthik Labs</title>
+  <meta name="description" content="Survive high-speed traffic, outrun police chases, and unlock futuristic vehicles in One Tap Escape: Car Dodge. The ultimate high-octane one-tap Android arcade racer by Karthik Labs." />
+  <meta name="keywords" content="One Tap Escape, Car Dodge, Android Game, Karthik Labs, Arcade Racing, Police Chase, Google Play Games, Endless Runner" />
+  <meta name="author" content="Karthik Labs" />
+
+  <!-- OpenGraph Meta Tags -->
+  <meta property="og:title" content="One Tap Escape: Car Dodge" />
+  <meta property="og:description" content="Survive high-speed traffic, outrun police chases, and unlock futuristic vehicles in One Tap Escape: Car Dodge." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://karthik1718.github.io/one-tap-escape/" />
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800;900&family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
 
   <style>
-    body {
-      margin: 0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: radial-gradient(circle at top, #1b2735, #090a0f);
-      color: #ffffff;
+    :root {
+      --bg-dark: #070913;
+      --bg-card: rgba(18, 24, 43, 0.65);
+      --border-card: rgba(0, 229, 255, 0.18);
+      --accent-cyan: #00E5FF;
+      --accent-cyan-glow: rgba(0, 229, 255, 0.4);
+      --accent-gold: #FFD700;
+      --accent-red: #FF1744;
+      --accent-purple: #7C4DFF;
+      --text-main: #F0F4F8;
+      --text-muted: #94A3B8;
     }
 
-    /* HERO */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Outfit', 'Inter', sans-serif;
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      overflow-x: hidden;
+      line-height: 1.6;
+    }
+
+    /* BACKGROUND ANIMATED CANVAS */
+    #bg-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 0;
+      pointer-events: none;
+      opacity: 0.6;
+    }
+
+    /* NAVIGATION */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 40px;
+      background: rgba(7, 9, 19, 0.85);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 900;
+      font-size: 22px;
+      letter-spacing: 0.5px;
+      color: #FFF;
+      text-decoration: none;
+    }
+
+    .nav-brand span.logo-badge {
+      background: linear-gradient(135deg, var(--accent-cyan), #0088FF);
+      color: #000;
+      padding: 4px 10px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 15px;
+      transition: color 0.25s ease, text-shadow 0.25s ease;
+    }
+
+    .nav-links a:hover {
+      color: var(--accent-cyan);
+      text-shadow: 0 0 12px var(--accent-cyan-glow);
+    }
+
+    .btn-privacy-nav {
+      border: 1px solid rgba(0, 229, 255, 0.4);
+      padding: 8px 18px;
+      border-radius: 30px;
+      color: var(--accent-cyan) !important;
+      transition: all 0.3s ease !important;
+    }
+
+    .btn-privacy-nav:hover {
+      background: rgba(0, 229, 255, 0.15);
+      border-color: var(--accent-cyan);
+      box-shadow: 0 0 15px var(--accent-cyan-glow);
+    }
+
+    /* CONTAINER SCALER */
+    .content-wrapper {
+      position: relative;
+      z-index: 10;
+    }
+
+    /* HERO SECTION */
     .hero {
       min-height: 100vh;
       display: flex;
-      align-items: center;
+      flex-direction: column;
       justify-content: center;
+      align-items: center;
       text-align: center;
-      padding: 40px 20px;
-      background: url('https://images.unsplash.com/photo-1500530855697-b586d89ba3ee') center/cover no-repeat;
+      padding: 140px 20px 80px;
       position: relative;
     }
 
-    .hero::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.7);
+    .hero-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(0, 229, 255, 0.08);
+      border: 1px solid rgba(0, 229, 255, 0.3);
+      padding: 6px 18px;
+      border-radius: 50px;
+      color: var(--accent-cyan);
+      font-size: 14px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 24px;
+      animation: pulseGlow 2.5s infinite ease-in-out;
     }
 
-    .hero-content {
-      position: relative;
-      max-width: 800px;
-      z-index: 1;
+    @keyframes pulseGlow {
+      0%, 100% { box-shadow: 0 0 15px rgba(0, 229, 255, 0.2); }
+      50% { box-shadow: 0 0 30px rgba(0, 229, 255, 0.5); }
     }
 
     .hero h1 {
-      font-size: 56px;
-      margin-bottom: 15px;
-      color: #ffcc00;
+      font-size: clamp(42px, 7vw, 76px);
+      font-weight: 900;
+      line-height: 1.05;
+      margin-bottom: 20px;
+      letter-spacing: -1px;
+      background: linear-gradient(180deg, #FFFFFF 30%, #94A3B8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero h1 span.highlight {
+      background: linear-gradient(90deg, var(--accent-cyan), var(--accent-gold));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
 
     .hero p {
-      font-size: 20px;
-      opacity: 0.9;
+      font-size: clamp(18px, 2.2vw, 22px);
+      color: var(--text-muted);
+      max-width: 750px;
+      margin: 0 auto 38px;
+      font-weight: 400;
     }
 
-    .cta {
-      margin-top: 30px;
-      display: inline-block;
-      padding: 14px 34px;
-      border-radius: 40px;
-      background: linear-gradient(90deg, #ffcc00, #ff9900);
-      color: #000;
-      font-weight: bold;
+    .hero-cta-group {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+      gap: 18px;
+    }
+
+    .cta-button-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      background: linear-gradient(135deg, var(--accent-cyan), #0091FF);
+      color: #070913;
+      padding: 16px 36px;
+      border-radius: 50px;
+      font-weight: 800;
+      font-size: 18px;
       text-decoration: none;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+      box-shadow: 0 10px 30px var(--accent-cyan-glow);
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
     }
 
-    /* SECTIONS */
+    .cta-button-primary:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 15px 40px rgba(0, 229, 255, 0.6);
+    }
+
+    .cta-button-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: var(--text-main);
+      padding: 16px 32px;
+      border-radius: 50px;
+      font-weight: 700;
+      font-size: 16px;
+      text-decoration: none;
+      backdrop-filter: blur(10px);
+      transition: all 0.25s ease;
+    }
+
+    .cta-button-secondary:hover {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(255, 255, 255, 0.4);
+      transform: translateY(-3px);
+    }
+
+    /* GAME STATS BADGES */
+    .hero-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 20px;
+      max-width: 900px;
+      width: 100%;
+      margin-top: 60px;
+    }
+
+    .stat-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-card);
+      border-radius: 16px;
+      padding: 20px;
+      backdrop-filter: blur(12px);
+      text-align: center;
+    }
+
+    .stat-value {
+      font-size: 32px;
+      font-weight: 900;
+      color: var(--accent-cyan);
+    }
+
+    .stat-label {
+      font-size: 14px;
+      color: var(--text-muted);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* SECTION STYLES */
     section {
       max-width: 1200px;
-      margin: auto;
-      padding: 80px 20px;
+      margin: 0 auto;
+      padding: 100px 24px;
     }
 
-    h2 {
+    .section-header {
       text-align: center;
-      color: #ffcc00;
-      font-size: 36px;
-      margin-bottom: 40px;
+      margin-bottom: 60px;
     }
 
-    /* GAMEPLAY */
-    .gameplay {
+    .section-header .tag {
+      color: var(--accent-cyan);
+      font-size: 14px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    .section-header h2 {
+      font-size: clamp(32px, 4.5vw, 48px);
+      font-weight: 900;
+      color: #FFF;
+      letter-spacing: -0.5px;
+    }
+
+    .section-header p {
+      color: var(--text-muted);
+      font-size: 18px;
+      max-width: 600px;
+      margin: 12px auto 0;
+    }
+
+    /* FEATURES GRID */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 28px;
+    }
+
+    .feature-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-card);
+      border-radius: 20px;
+      padding: 36px 28px;
+      backdrop-filter: blur(16px);
+      transition: all 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .feature-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, var(--accent-cyan), transparent);
+      opacity: 0;
+      transition: opacity 0.35s ease;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-8px);
+      border-color: rgba(0, 229, 255, 0.4);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+    }
+
+    .feature-card:hover::before {
+      opacity: 1;
+    }
+
+    .feature-icon {
+      width: 60px;
+      height: 60px;
+      border-radius: 16px;
+      background: rgba(0, 229, 255, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      margin-bottom: 22px;
+      border: 1px solid rgba(0, 229, 255, 0.2);
+    }
+
+    .feature-card h3 {
+      font-size: 22px;
+      font-weight: 800;
+      color: #FFF;
+      margin-bottom: 12px;
+    }
+
+    .feature-card p {
+      color: var(--text-muted);
+      font-size: 15px;
+      line-height: 1.6;
+    }
+
+    /* VEHICLE SHOWCASE */
+    .vehicles-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 24px;
+    }
+
+    .vehicle-card {
+      background: var(--bg-card);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 20px;
+      padding: 28px;
+      text-align: center;
+      backdrop-filter: blur(12px);
+      transition: all 0.3s ease;
+    }
+
+    .vehicle-card:hover {
+      border-color: var(--accent-gold);
+      transform: translateY(-5px);
+    }
+
+    .vehicle-emoji {
+      font-size: 54px;
+      margin-bottom: 16px;
+      display: block;
+      filter: drop-shadow(0 10px 15px rgba(0, 0, 0, 0.5));
+    }
+
+    .vehicle-card h3 {
+      font-size: 20px;
+      font-weight: 800;
+      color: #FFF;
+      margin-bottom: 6px;
+    }
+
+    .vehicle-card .badge {
+      display: inline-block;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--accent-gold);
+      background: rgba(255, 215, 0, 0.12);
+      padding: 4px 12px;
+      border-radius: 20px;
+      margin-bottom: 12px;
+    }
+
+    .vehicle-card p {
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+
+    /* THEMES GRID */
+    .themes-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 30px;
+      gap: 24px;
     }
 
-    .gameplay img {
-      width: 100%;
+    .theme-card {
+      position: relative;
       border-radius: 20px;
-      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
-    }
-
-    /* FEATURES */
-    .features {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 30px;
-    }
-
-    .feature {
-      background: rgba(255, 255, 255, 0.06);
       padding: 30px;
-      border-radius: 18px;
+      min-height: 180px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transition: transform 0.3s ease, border-color 0.3s ease;
+    }
+
+    .theme-card:hover {
+      transform: scale(1.03);
+      border-color: var(--accent-cyan);
+    }
+
+    .theme-city { background: linear-gradient(135deg, #1A237E, #0D47A1); }
+    .theme-cyberpunk { background: linear-gradient(135deg, #4A148C, #880E4F); }
+    .theme-desert { background: linear-gradient(135deg, #E65100, #BF360C); }
+    .theme-forest { background: linear-gradient(135deg, #1B5E20, #004D40); }
+
+    .theme-card h3 {
+      font-size: 22px;
+      font-weight: 800;
+      color: #FFF;
+      z-index: 2;
+    }
+
+    .theme-card p {
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.8);
+      z-index: 2;
+    }
+
+    /* PRIVACY POLICY BANNER / FOOTER */
+    .privacy-highlight-box {
+      background: linear-gradient(135deg, rgba(0, 229, 255, 0.08), rgba(124, 77, 255, 0.08));
+      border: 1px solid var(--border-card);
+      border-radius: 24px;
+      padding: 48px 36px;
       text-align: center;
-      backdrop-filter: blur(10px);
+      margin: 40px auto;
+      max-width: 900px;
     }
 
-    .feature h3 {
-      color: #ffcc00;
-      margin-bottom: 10px;
+    .privacy-highlight-box h3 {
+      font-size: 28px;
+      font-weight: 800;
+      color: #FFF;
+      margin-bottom: 12px;
     }
 
-    /* FOOTER */
+    .privacy-highlight-box p {
+      color: var(--text-muted);
+      font-size: 16px;
+      max-width: 650px;
+      margin: 0 auto 24px;
+    }
+
+    .btn-privacy-large {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(0, 229, 255, 0.15);
+      border: 1.5px solid var(--accent-cyan);
+      color: var(--accent-cyan);
+      padding: 14px 32px;
+      border-radius: 40px;
+      font-weight: 700;
+      font-size: 16px;
+      text-decoration: none;
+      transition: all 0.3s ease;
+    }
+
+    .btn-privacy-large:hover {
+      background: var(--accent-cyan);
+      color: #070913;
+      box-shadow: 0 0 25px var(--accent-cyan-glow);
+    }
+
     footer {
-      background: #000;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 40px 24px;
+      background: #04050A;
       text-align: center;
-      padding: 30px 20px;
       font-size: 14px;
-      opacity: 0.8;
+      color: var(--text-muted);
+    }
+
+    footer a {
+      color: var(--accent-cyan);
+      text-decoration: none;
+      font-weight: 600;
+      margin: 0 10px;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
+
+    .footer-links {
+      margin: 16px 0;
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+      nav {
+        padding: 16px 20px;
+      }
+      .nav-links {
+        display: none;
+      }
+      .hero {
+        padding-top: 120px;
+      }
+      .hero-stats {
+        grid-template-columns: repeat(2, 1fr);
+      }
     }
   </style>
-
 </head>
 <body>
 
-<!-- HERO -->
+  <!-- BACKGROUND ANIMATED CANVAS -->
+  <canvas id="bg-canvas"></canvas>
 
-<div class="hero">
-  <div class="hero-content">
-    <h1>One Tap Escape</h1>
-    <p>Survive the traffic. One tap at a time.</p>
-    <a class="cta" href="#">Coming Soon on Google Play</a>
+  <div class="content-wrapper">
+    <!-- NAVIGATION BAR -->
+    <nav>
+      <a href="#" class="nav-brand">
+        <span class="logo-badge">1-TAP</span>
+        One Tap Escape
+      </a>
+      <ul class="nav-links">
+        <li><a href="#features">Features</a></li>
+        <li><a href="#garage">Garage</a></li>
+        <li><a href="#themes">Themes</a></li>
+        <li><a href="https://karthik1718.github.io/one-tap-escape/privacy-policy" id="nav-privacy-link" class="btn-privacy-nav">Privacy Policy</a></li>
+      </ul>
+    </nav>
+
+    <!-- HERO SECTION -->
+    <header class="hero">
+      <div class="hero-pill">🏎️ High-Octane Android Racer</div>
+      <h1>One Tap <span class="highlight">Escape</span></h1>
+      <p>Survive relentless traffic, outrun high-stakes police chases, and conquer the global leaderboards with ultra-responsive one-tap controls.</p>
+      
+      <div class="hero-cta-group">
+        <a href="https://play.google.com/store/apps/details?id=com.karthik" id="cta-playstore" class="cta-button-primary">
+          <span>📲 Get on Google Play</span>
+        </a>
+        <a href="https://karthik1718.github.io/one-tap-escape/privacy-policy" id="cta-privacy" class="cta-button-secondary">
+          <span>📜 Privacy Policy</span>
+        </a>
+      </div>
+
+      <!-- QUICK STATS -->
+      <div class="hero-stats">
+        <div class="stat-card">
+          <div class="stat-value">1-TAP</div>
+          <div class="stat-label">Ultra Precision</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">3 STARS</div>
+          <div class="stat-label">Wanted System</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">4</div>
+          <div class="stat-label">Iconic Vehicles</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">4</div>
+          <div class="stat-label">Environments</div>
+        </div>
+      </div>
+    </header>
+
+    <!-- KEY GAME FEATURES SECTION -->
+    <section id="features">
+      <div class="section-header">
+        <span class="tag">Adrenaline Rush</span>
+        <h2>Built for Speed & Precision</h2>
+        <p>Experience an arcade racer engineered for maximum excitement, smooth 60 FPS action, and intense replay value.</p>
+      </div>
+
+      <div class="features-grid">
+        <div class="feature-card" id="feature-controls">
+          <div class="feature-icon">⚡</div>
+          <h3>One-Tap Steering</h3>
+          <p>Instant lane changes with simple tap controls. Quick reaction times let you weave through dense traffic with sub-millisecond precision.</p>
+        </div>
+
+        <div class="feature-card" id="feature-police">
+          <div class="feature-icon">🚓</div>
+          <h3>Wanted Police System</h3>
+          <p>Build up to 3 Wanted Stars! Dodge police roadblocks or activate Nitro Boost to outrun pursuing squad cars before you're busted.</p>
+        </div>
+
+        <div class="feature-card" id="feature-ghost">
+          <div class="feature-icon">👻</div>
+          <h3>Real-Time Ghost Racing</h3>
+          <p>Race against your own previous personal best recorded live as a translucent ghost car on the track. Push your limits on every single run!</p>
+        </div>
+
+        <div class="feature-card" id="feature-nearmiss">
+          <div class="feature-icon">💥</div>
+          <h3>Near-Miss Bonus System</h3>
+          <p>Scrape past oncoming obstacles and sidewalk pedestrians for huge score multipliers and bonus coins. High risk, high reward!</p>
+        </div>
+
+        <div class="feature-card" id="feature-leaderboards">
+          <div class="feature-icon">🏆</div>
+          <h3>Google Play Leaderboards</h3>
+          <p>Seamless automatic silent sign-in with Google Play Games Services v2. Compete with friends and top global racers for total dominance.</p>
+        </div>
+
+        <div class="feature-card" id="feature-powerups">
+          <div class="feature-icon">🧲</div>
+          <h3>Power-Up Arsenal</h3>
+          <p>Equip Coin Magnets to vacuum loot, Collision Shields for extra lives, Slow-Motion for tight gaps, and Nitro Boosts to smash barriers!</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- GARAGE & CARS SHOWCASE -->
+    <section id="garage">
+      <div class="section-header">
+        <span class="tag">Customization</span>
+        <h2>The Garage & Shop</h2>
+        <p>Earn coins on every run to unlock legendary rides, custom paint jobs, and vibrant ambient themes.</p>
+      </div>
+
+      <div class="vehicles-container">
+        <div class="vehicle-card" id="car-speedracer">
+          <span class="vehicle-emoji">🏎️</span>
+          <h3>Speed Racer</h3>
+          <span class="badge">DEFAULT UNLOCKED</span>
+          <p>Streamlined aerodynamic body with twin exhausts and agile handling.</p>
+        </div>
+
+        <div class="vehicle-card" id="car-cybertruck">
+          <span class="vehicle-emoji">🚚</span>
+          <h3>Cyber Truck</h3>
+          <span class="badge">800 COINS</span>
+          <p>Heavy armor-plated chassis with neon laser lightbars.</p>
+        </div>
+
+        <div class="vehicle-card" id="car-musclebeast">
+          <span class="vehicle-emoji">🔥</span>
+          <h3>Muscle Beast</h3>
+          <span class="badge">1,500 COINS</span>
+          <p>Raw V8 muscle car with iconic racing stripes & dual rear exhausts.</p>
+        </div>
+
+        <div class="vehicle-card" id="car-superbolt">
+          <span class="vehicle-emoji">⚡</span>
+          <h3>Super Bolt</h3>
+          <span class="badge">3,000 COINS</span>
+          <p>High-downforce hypercar equipped with an aggressive carbon wing.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- DYNAMIC ENVIRONMENT THEMES -->
+    <section id="themes">
+      <div class="section-header">
+        <span class="tag">Visual Variety</span>
+        <h2>Explore 4 Dynamic Themes</h2>
+        <p>Switch up your racing atmosphere with stunning color palettes and custom environmental vibes.</p>
+      </div>
+
+      <div class="themes-grid">
+        <div class="theme-card theme-city" id="theme-vibrantcity">
+          <h3>Vibrant City</h3>
+          <p>Default bright metropolis highway</p>
+        </div>
+
+        <div class="theme-card theme-cyberpunk" id="theme-cyberpunk">
+          <h3>Cyberpunk Night</h3>
+          <p>Neon-soaked futuristic night track</p>
+        </div>
+
+        <div class="theme-card theme-desert" id="theme-desert">
+          <h3>Desert Outrun</h3>
+          <p>Sun-baked synthwave desert highway</p>
+        </div>
+
+        <div class="theme-card theme-forest" id="theme-forest">
+          <h3>Midnight Forest</h3>
+          <p>Atmospheric dark woodland route</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- PRIVACY POLICY BANNER SECTION -->
+    <section id="privacy-section">
+      <div class="privacy-highlight-box">
+        <h3>Privacy & Data Transparency</h3>
+        <p>We respect your privacy. One Tap Escape does not collect personally identifiable information directly and utilizes Google AdMob & Play Games Services for secure, seamless play.</p>
+        <a href="https://karthik1718.github.io/one-tap-escape/privacy-policy" id="btn-privacy-explicit" class="btn-privacy-large" target="_blank" rel="noopener">
+          <span>🔒 Read Full Privacy Policy</span>
+        </a>
+      </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+      <p>© 2026 <strong>Karthik Labs</strong>. All rights reserved.</p>
+      <div class="footer-links">
+        <a href="#">Home</a> • 
+        <a href="#features">Features</a> • 
+        <a href="#garage">Garage</a> • 
+        <a href="https://karthik1718.github.io/one-tap-escape/privacy-policy" id="footer-privacy-link">Privacy Policy</a>
+      </div>
+      <p style="font-size: 12px; margin-top: 8px;">Designed for high-speed mobile gaming on Android.</p>
+    </footer>
   </div>
-</div>
 
-<!-- GAMEPLAY -->
+  <!-- DYNAMIC ANIMATED BACKGROUND CANVAS SCRIPT -->
+  <script>
+    (function() {
+      const canvas = document.getElementById('bg-canvas');
+      const ctx = canvas.getContext('2d');
 
-<section>
-  <h2>Gameplay</h2>
-  <div class="gameplay">
-    <img src="https://images.unsplash.com/photo-1500534623283-312aade485b7" alt="Gameplay 1" />
-    <img src="https://images.unsplash.com/photo-1520975916090-3105956dac38" alt="Gameplay 2" />
-    <img src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee" alt="Gameplay 3" />
-  </div>
-</section>
+      let width = canvas.width = window.innerWidth;
+      let height = canvas.height = window.innerHeight;
 
-<!-- FEATURES -->
+      window.addEventListener('resize', () => {
+        width = canvas.width = window.innerWidth;
+        height = canvas.height = window.innerHeight;
+      });
 
-<section>
-  <h2>Why You'll Love It</h2>
-  <div class="features">
-    <div class="feature">
-      <h3>One-Tap Control</h3>
-      <p>Instant lane changes with a single tap.</p>
-    </div>
-    <div class="feature">
-      <h3>Endless Challenge</h3>
-      <p>Speed increases as you survive longer.</p>
-    </div>
-    <div class="feature">
-      <h3>Minimal Design</h3>
-      <p>Clean visuals focused on pure gameplay.</p>
-    </div>
-    <div class="feature">
-      <h3>Rewarded Boosts</h3>
-      <p>Optional ads to continue your run.</p>
-    </div>
-  </div>
-</section>
+      // Animated road grid lines and light streaks
+      const streaks = [];
+      const streakCount = 45;
 
-<!-- FOOTER -->
+      for (let i = 0; i < streakCount; i++) {
+        streaks.push({
+          x: Math.random() * width,
+          y: Math.random() * height,
+          length: Math.random() * 80 + 30,
+          speed: Math.random() * 6 + 2,
+          color: Math.random() > 0.4 ? '#00E5FF' : '#FFD700',
+          alpha: Math.random() * 0.6 + 0.2
+        });
+      }
 
-<footer>
-  © 2026 <strong>Karthik Labs</strong> · All rights reserved.
-</footer>
+      function animate() {
+        ctx.clearRect(0, 0, width, height);
 
+        // Draw animated streaks simulating high-speed road lines
+        streaks.forEach(s => {
+          s.y += s.speed;
+          if (s.y > height) {
+            s.y = -s.length;
+            s.x = Math.random() * width;
+          }
+
+          ctx.beginPath();
+          ctx.moveTo(s.x, s.y);
+          ctx.lineTo(s.x, s.y + s.length);
+          ctx.strokeStyle = s.color;
+          ctx.globalAlpha = s.alpha;
+          ctx.lineWidth = 2;
+          ctx.shadowBlur = 10;
+          ctx.shadowColor = s.color;
+          ctx.stroke();
+        });
+
+        ctx.globalAlpha = 1;
+        ctx.shadowBlur = 0;
+        requestAnimationFrame(animate);
+      }
+
+      animate();
+    })();
+  </script>
 </body>
 </html>
