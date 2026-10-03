@@ -1,0 +1,17 @@
+## Template for local.properties (DO NOT commit actual local.properties)
+## Copy this file to local.properties and fill in your real values.
+##
+## local.properties is excluded from git via .gitignore.
+
+# Android SDK location (set automatically by Android Studio)
+sdk.dir=/path/to/your/Android/Sdk
+
+# AdMob credentials (from Google AdMob console)
+admob.app_id=ca-app-pub-XXXXXXXXXXXXXXXX~XXXXXXXXXX
+admob.rewarded_id=ca-app-pub-XXXXXXXXXXXXXXXX/XXXXXXXXXX
+
+# Google Play Games Services App ID (numeric, from Play Console → Play Games Services → Configuration)
+games.app_id=000000000000
+
+# Google Play Games Leaderboard ID (CgkI... format, from Play Console → Leaderboards)
+games.leaderboard_id=CgkIxxxxxxxxxxxxxxxx
