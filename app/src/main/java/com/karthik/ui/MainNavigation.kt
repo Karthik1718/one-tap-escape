@@ -20,16 +20,25 @@ fun MainNavigation() {
         composable("home") {
             HomeScreen(
                 onPlayClick = { navController.navigate("game/0") },
-                onCustomizeClick = { navController.navigate("customize") }
+                onCustomizeClick = { navController.navigate("customize") },
+                onLeaderboardClick = { navController.navigate("leaderboard") }
             )
         }
         composable("customize") {
             CustomizeScreen(onBack = { navController.popBackStack() })
         }
+        composable("leaderboard") {
+            LeaderboardScreen(onBack = { navController.popBackStack() })
+        }
         composable("game/{level}") {
-            GameScreen(onBackToMenu = {
-                navController.popBackStack("home", inclusive = false)
-            })
+            GameScreen(
+                onBackToMenu = {
+                    navController.popBackStack("home", inclusive = false)
+                },
+                onOpenLeaderboard = {
+                    navController.navigate("leaderboard")
+                }
+            )
         }
     }
 }

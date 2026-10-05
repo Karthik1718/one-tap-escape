@@ -38,7 +38,10 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
-fun GameScreen(onBackToMenu: () -> Unit) {
+fun GameScreen(
+    onBackToMenu: () -> Unit,
+    onOpenLeaderboard: () -> Unit = {}
+) {
     val context = LocalContext.current
     val saveManager = remember { com.karthik.data.SaveManager(context) }
     val engine = remember { GameEngine(saveManager, context) }
@@ -1252,7 +1255,7 @@ fun GameScreen(onBackToMenu: () -> Unit) {
 
             // 10. Game Over Overlay
             if (engine.gameState == GameState.GAME_OVER) {
-                GameOverOverlay(engine, activity, onBackToMenu, snackbarHostState, scope)
+                GameOverOverlay(engine, activity, onBackToMenu, onOpenLeaderboard, snackbarHostState, scope)
             }
         }
     }
@@ -1337,9 +1340,6 @@ fun PoliceBustedOverlay(
                 OutlinedButton(
                     onClick = {
                         engine.giveUpPolice()
-                        if (activity != null) {
-                            com.karthik.data.PlayGamesManager.submitScore(activity, engine.score.toLong())
-                        }
                     },
                     modifier = Modifier.fillMaxWidth().height(48.dp),
                     colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.White),
@@ -1357,20 +1357,13 @@ fun GameOverOverlay(
     engine: GameEngine, 
     activity: Activity?, 
     onBackToMenu: () -> Unit,
+    onOpenLeaderboard: () -> Unit,
     snackbarHostState: SnackbarHostState,
     scope: kotlinx.coroutines.CoroutineScope
 ) {
     val context = LocalContext.current
     val isNewHighScore = engine.score >= com.karthik.data.SaveManager.highScore
-    val isSignedIn = com.karthik.data.PlayGamesManager.isSignedIn
 
-    // Auto-submit score to Play Games leaderboard once
-    LaunchedEffect(Unit) {
-        if (activity != null) {
-            com.karthik.data.PlayGamesManager.submitScore(activity, engine.score.toLong())
-        }
-    }
-    
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -1429,9 +1422,7 @@ fun GameOverOverlay(
                     // Leaderboard Button
                     Button(
                         onClick = {
-                            if (activity != null) {
-                                com.karthik.data.PlayGamesManager.showLeaderboard(activity)
-                            }
+                            onOpenLeaderboard()
                         },
                         modifier = Modifier.weight(1f).height(52.dp),
                         colors = ButtonDefaults.buttonColors(

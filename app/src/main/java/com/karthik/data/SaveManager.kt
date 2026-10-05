@@ -17,10 +17,14 @@ class SaveManager(context: Context) {
         private const val KEY_PURCHASED_MODELS = "purchased_models"
         private const val KEY_SELECTED_MODEL = "selected_model"
         private const val KEY_TUTORIAL_COMPLETED = "tutorial_completed"
+        private const val KEY_USER_ID = "user_id"
+        private const val KEY_USERNAME = "user_name"
+        private const val KEY_AVATAR_ID = "user_avatar_id"
 
         val ALL_COLORS = setOf("#00E5FF", "#FF4081", "#7C4DFF", "#FFEA00", "#00C853", "#FF3D00", "#FFFFFF")
         val ALL_THEMES = setOf("VIBRANT_CITY", "CYBERPUNK_NIGHT", "DESERT_OUTRUN", "MIDNIGHT_FOREST")
         val ALL_MODELS = setOf("SPEED_RACER", "CYBER_TRUCK", "POLICE_CRUISER", "SUPER_BOLT")
+        val AVAILABLE_AVATARS = listOf("🏎️", "🚓", "⚡", "🤖", "🐲", "🦊", "🦁", "🚀", "👾", "👻", "🐯", "🐺")
 
         // Global shared state for reactivity across instances
         var totalCoins by mutableStateOf(0)
@@ -28,18 +32,34 @@ class SaveManager(context: Context) {
         
         var highScore by mutableStateOf(0f)
             private set
-            
+
+        var username by mutableStateOf("")
+            private set
+
+        var avatarId by mutableStateOf("")
+            private set
+
         private var initialized = false
     }
 
     val totalCoins get() = Companion.totalCoins
     val highScore get() = Companion.highScore
+    val username get() = Companion.username
+    val avatarId get() = Companion.avatarId
 
     init {
         if (!initialized) {
             Companion.totalCoins = prefs.getInt(KEY_COINS, 0)
             Companion.highScore = prefs.getFloat(KEY_HIGH_SCORE, 0f)
+            Companion.username = prefs.getString(KEY_USERNAME, "") ?: ""
+            Companion.avatarId = prefs.getString(KEY_AVATAR_ID, "") ?: ""
             initialized = true
+        }
+
+        // Ensure userId exists
+        if (getUserId().isBlank()) {
+            val newUuid = java.util.UUID.randomUUID().toString()
+            prefs.edit().putString(KEY_USER_ID, newUuid).apply()
         }
 
         // If test mode was previously applied on this device, revert back to clean state
@@ -58,6 +78,23 @@ class SaveManager(context: Context) {
         }
     }
 
+    fun getUserId(): String {
+        return prefs.getString(KEY_USER_ID, "") ?: ""
+    }
+
+    fun saveUserProfile(name: String, avatar: String) {
+        Companion.username = name
+        Companion.avatarId = avatar
+        prefs.edit()
+            .putString(KEY_USERNAME, name)
+            .putString(KEY_AVATAR_ID, avatar)
+            .apply()
+    }
+
+    fun getRandomAvatar(): String {
+        return AVAILABLE_AVATARS.random()
+    }
+
     fun addCoins(amount: Int) {
         Companion.totalCoins += amount
         prefs.edit().putInt(KEY_COINS, Companion.totalCoins).apply()
@@ -67,6 +104,16 @@ class SaveManager(context: Context) {
         if (score > highScore) {
             Companion.highScore = score
             prefs.edit().putFloat(KEY_HIGH_SCORE, Companion.highScore).apply()
+            
+            // Auto-sync new high score to Firebase if username exists
+            if (username.isNotBlank()) {
+                FirebaseLeaderboardManager.saveUserProfileAndScore(
+                    userId = getUserId(),
+                    username = username,
+                    avatarId = avatarId,
+                    score = Companion.highScore.toLong()
+                )
+            }
         }
     }
 

@@ -19,14 +19,16 @@ import com.karthik.audio.AudioManager
 import com.karthik.data.PlayGamesManager
 
 @Composable
-fun HomeScreen(onPlayClick: () -> Unit, onCustomizeClick: () -> Unit) {
+fun HomeScreen(
+    onPlayClick: () -> Unit,
+    onCustomizeClick: () -> Unit,
+    onLeaderboardClick: () -> Unit
+) {
     val context = LocalContext.current
-    val activity = context as? Activity
     val saveManager = remember { com.karthik.data.SaveManager(context) }
     val highScore = saveManager.highScore
     val coins = saveManager.totalCoins
     val selectedModel = saveManager.getSelectedModel()
-    val isSignedIn = PlayGamesManager.isSignedIn
     var showTutorial by remember { mutableStateOf(false) }
 
     val modelName = when(selectedModel) {
@@ -149,18 +151,11 @@ fun HomeScreen(onPlayClick: () -> Unit, onCustomizeClick: () -> Unit) {
             OutlinedButton(
                 onClick = {
                     AudioManager.playSfx(context, "button")
-                    if (activity != null) {
-                        PlayGamesManager.showLeaderboard(activity)
-                    }
+                    onLeaderboardClick()
                 },
                 modifier = Modifier.fillMaxWidth().height(52.dp),
-                colors = ButtonDefaults.outlinedButtonColors(
-                    contentColor = if (isSignedIn) Color(0xFF00E5FF) else Color.White.copy(alpha = 0.55f)
-                ),
-                border = androidx.compose.foundation.BorderStroke(
-                    1.5.dp,
-                    if (isSignedIn) Color(0xFF00E5FF).copy(alpha = 0.8f) else Color.White.copy(alpha = 0.3f)
-                ),
+                colors = ButtonDefaults.outlinedButtonColors(contentColor = Color(0xFF00E5FF)),
+                border = androidx.compose.foundation.BorderStroke(1.5.dp, Color(0xFF00E5FF).copy(alpha = 0.8f)),
                 shape = RoundedCornerShape(18.dp)
             ) {
                 Row(
@@ -169,8 +164,8 @@ fun HomeScreen(onPlayClick: () -> Unit, onCustomizeClick: () -> Unit) {
                 ) {
                     Text("🏆 ", fontSize = 16.sp)
                     Text(
-                        text = if (isSignedIn) "LEADERBOARD" else "LEADERBOARD (SIGN IN)",
-                        fontSize = 12.sp,
+                        text = "LEADERBOARD",
+                        fontSize = 14.sp,
                         fontWeight = FontWeight.Bold,
                         maxLines = 1,
                         softWrap = false
