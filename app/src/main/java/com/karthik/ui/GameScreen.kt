@@ -605,10 +605,10 @@ fun GameScreen(onBackToMenu: () -> Unit) {
                         drawCircle(color = p.color.copy(alpha = p.alpha), radius = p.size, center = Offset(centerX + p.x, pCanvasY))
                     }
 
-                    // 8. GHOST BEST-RUN CAR (drawn behind player car)
-                    if (engine.ghost?.hasGhost == true && engine.gameState == GameState.PLAYING) {
+                    // 8. GHOST BEST-RUN CAR (drawn relative to player car)
+                    if (engine.ghost?.hasGhost == true && engine.ghost?.isGhostActive == true && engine.gameState == GameState.PLAYING) {
                         val gx = centerX + engine.ghostX
-                        val gy = centerY
+                        val gy = centerY - (engine.ghost?.ghostDelta ?: 0f)
                         val gW = 96f
                         val gH = 176f
                         val ghostAlpha = 0.38f
@@ -956,35 +956,39 @@ fun GameScreen(onBackToMenu: () -> Unit) {
                             }
                         }
                     }
-                    // Line 2: Ghost Best label + Ahead/Behind delta (separate row, below line 1)
-                    if (engine.ghost?.hasGhost == true && engine.gameState == GameState.PLAYING) {
+                    // Line 2: Best Score / Ghost Run Tracker (BEHIND until best score beaten, then AHEAD + NEW RECORD)
+                    val targetBestDistance = kotlin.math.max(engine.highScore * 10f, engine.ghost?.ghostMaxDistance ?: 0f)
+                    if (targetBestDistance > 0f && engine.gameState == GameState.PLAYING) {
+                        val diffMeters = (engine.distanceTravelled - targetBestDistance) / 10f
+                        val isAhead = diffMeters >= 0f
                         Row(
                             horizontalArrangement = Arrangement.spacedBy(6.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Surface(
-                                color = Color(0xFF00E5FF).copy(alpha = 0.18f),
+                                color = if (isAhead) Color(0xFFFFD700).copy(alpha = 0.22f) else Color(0xFF00E5FF).copy(alpha = 0.18f),
                                 shape = RoundedCornerShape(8.dp),
-                                border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF00E5FF).copy(alpha = 0.5f))
+                                border = androidx.compose.foundation.BorderStroke(
+                                    1.dp,
+                                    if (isAhead) Color(0xFFFFD700).copy(alpha = 0.8f) else Color(0xFF00E5FF).copy(alpha = 0.5f)
+                                )
                             ) {
                                 Text(
-                                    "👻 GHOST BEST",
-                                    color = Color(0xFF00E5FF),
+                                    text = if (isAhead) "👑 NEW RECORD" else "👻 GHOST BEST",
+                                    color = if (isAhead) Color(0xFFFFD700) else Color(0xFF00E5FF),
                                     fontSize = 11.sp,
                                     fontWeight = FontWeight.Black,
                                     modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
                                 )
                             }
-                            val delta = engine.ghost.ghostDelta
-                            val isAhead = delta < 0f
                             Surface(
                                 color = if (isAhead) Color(0xFF00C853).copy(alpha = 0.85f)
                                         else Color(0xFFFF6D00).copy(alpha = 0.85f),
                                 shape = RoundedCornerShape(8.dp)
                             ) {
                                 Text(
-                                    text = if (isAhead) "AHEAD +${(-delta / 10f).toInt()}m"
-                                           else "BEHIND -${(delta / 10f).toInt()}m",
+                                    text = if (isAhead) "AHEAD +${diffMeters.toInt()}m"
+                                           else "BEHIND -${(-diffMeters).toInt()}m",
                                     color = Color.White,
                                     fontWeight = FontWeight.Black,
                                     fontSize = 11.sp,

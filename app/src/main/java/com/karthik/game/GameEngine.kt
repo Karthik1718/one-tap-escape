@@ -162,8 +162,8 @@ class GameEngine(private val saveManager: SaveManager? = null, context: android.
         if (gameState != GameState.PLAYING) return
 
         // Ghost Run: record current lane and update ghost X
-        ghost?.record(distanceTravelled, currentLaneIndex)
-        ghostX = ghost?.updateGhostX(distanceTravelled, horizontalOffset) ?: 0f
+        ghost?.record(deltaTime, distanceTravelled, currentLaneIndex)
+        ghostX = ghost?.updateGhostX(deltaTime, distanceTravelled, horizontalOffset) ?: 0f
 
         // Power-Up Countdown Timers
         if (magnetTimer > 0) magnetTimer = (magnetTimer - deltaTime).coerceAtLeast(0f)
