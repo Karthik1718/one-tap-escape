@@ -93,6 +93,9 @@ fun GameScreen(onBackToMenu: () -> Unit) {
             engine.nearMissTrigger = false
         }
     }
+
+    // Tutorial state — show on first launch only
+    var showTutorial by remember { mutableStateOf(!saveManager.isTutorialCompleted()) }
     
     LaunchedEffect(Unit) {
         engine.reset(autoStart = false)
@@ -123,6 +126,7 @@ fun GameScreen(onBackToMenu: () -> Unit) {
                 .fillMaxSize()
                 .pointerInput(Unit) {
                     detectTapGestures { offset ->
+                        if (showTutorial) return@detectTapGestures
                         if (engine.gameState == GameState.PLAYING) {
                             engine.onTouch(isLeft = offset.x < size.width / 2)
                         } else if (engine.gameState == GameState.IDLE) {
@@ -1209,8 +1213,22 @@ fun GameScreen(onBackToMenu: () -> Unit) {
                 }
             }
 
-            // 8. Idle Start Screen
-            if (engine.gameState == GameState.IDLE) {
+            // 8. First-Time Tutorial Overlay
+            if (showTutorial) {
+                TutorialOverlay(
+                    onComplete = {
+                        saveManager.setTutorialCompleted(true)
+                        showTutorial = false
+                    },
+                    onSkip = {
+                        saveManager.setTutorialCompleted(true)
+                        showTutorial = false
+                    }
+                )
+            }
+
+            // 9. Idle Start Screen
+            if (engine.gameState == GameState.IDLE && !showTutorial) {
                 Box(modifier = Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.35f)), contentAlignment = Alignment.Center) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Text("TAP TO START", fontSize = 26.sp, fontWeight = FontWeight.Black, color = Color.White, textAlign = TextAlign.Center)
@@ -1250,6 +1268,7 @@ fun PoliceBustedOverlay(
     Box(
         modifier = Modifier
             .fillMaxSize()
+            .pointerInput(Unit) { detectTapGestures { } }
             .background(Brush.verticalGradient(listOf(Color(0xFFB71C1C).copy(alpha = 0.94f), Color(0xFF880E4F).copy(alpha = 0.96f)))),
         contentAlignment = Alignment.Center
     ) {
@@ -1355,6 +1374,7 @@ fun GameOverOverlay(
     Box(
         modifier = Modifier
             .fillMaxSize()
+            .pointerInput(Unit) { detectTapGestures { } }
             .background(Brush.verticalGradient(listOf(Color(0xFF1A237E).copy(alpha = 0.92f), Color(0xFF0D47A1).copy(alpha = 0.96f)))), 
         contentAlignment = Alignment.Center
     ) {

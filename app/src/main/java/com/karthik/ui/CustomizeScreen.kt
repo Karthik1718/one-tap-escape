@@ -10,6 +10,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -92,6 +94,18 @@ fun CustomizeScreen(onBack: () -> Unit) {
             TopAppBar(
                 title = { Text("GARAGE & SHOP", color = Color.White, fontWeight = FontWeight.Black) },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
+                navigationIcon = {
+                    IconButton(onClick = {
+                        AudioManager.playSfx(context, "button")
+                        onBack()
+                    }) {
+                        Icon(
+                            imageVector = Icons.Default.ArrowBack,
+                            contentDescription = "Back to menu",
+                            tint = Color.White
+                        )
+                    }
+                },
                 actions = {
                     Text("💰 $coins", color = Color(0xFFFFD600), modifier = Modifier.padding(end = 16.dp), fontWeight = FontWeight.Bold, fontSize = 20.sp)
                 }
@@ -314,18 +328,7 @@ fun CustomizeScreen(onBack: () -> Unit) {
                     }
                 }
                 
-                Spacer(modifier = Modifier.height(32.dp))
-                Button(
-                    onClick = {
-                        AudioManager.playSfx(context, "button")
-                        onBack()
-                    }, 
-                    modifier = Modifier.fillMaxWidth().height(52.dp), 
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.White),
-                    shape = RoundedCornerShape(12.dp)
-                ) {
-                    Text("BACK TO MENU", color = Color(0xFF1A237E), fontWeight = FontWeight.Bold, fontSize = 16.sp)
-                }
+                Spacer(modifier = Modifier.height(16.dp))
             }
         }
     }

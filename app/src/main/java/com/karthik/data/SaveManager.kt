@@ -16,6 +16,7 @@ class SaveManager(context: Context) {
         private const val KEY_SELECTED_THEME = "selected_theme"
         private const val KEY_PURCHASED_MODELS = "purchased_models"
         private const val KEY_SELECTED_MODEL = "selected_model"
+        private const val KEY_TUTORIAL_COMPLETED = "tutorial_completed"
 
         val ALL_COLORS = setOf("#00E5FF", "#FF4081", "#7C4DFF", "#FFEA00", "#00C853", "#FF3D00", "#FFFFFF")
         val ALL_THEMES = setOf("VIBRANT_CITY", "CYBERPUNK_NIGHT", "DESERT_OUTRUN", "MIDNIGHT_FOREST")
@@ -118,5 +119,11 @@ class SaveManager(context: Context) {
 
     fun saveSelectedModel(modelId: String) {
         prefs.edit().putString(KEY_SELECTED_MODEL, modelId).apply()
+    }
+
+    fun isTutorialCompleted(): Boolean = prefs.getBoolean(KEY_TUTORIAL_COMPLETED, false)
+
+    fun setTutorialCompleted(completed: Boolean) {
+        prefs.edit().putBoolean(KEY_TUTORIAL_COMPLETED, completed).apply()
     }
 }

@@ -27,6 +27,7 @@ fun HomeScreen(onPlayClick: () -> Unit, onCustomizeClick: () -> Unit) {
     val coins = saveManager.totalCoins
     val selectedModel = saveManager.getSelectedModel()
     val isSignedIn = PlayGamesManager.isSignedIn
+    var showTutorial by remember { mutableStateOf(false) }
 
     val modelName = when(selectedModel) {
         "CYBER_TRUCK" -> "🚚 Cyber Truck"
@@ -35,16 +36,30 @@ fun HomeScreen(onPlayClick: () -> Unit, onCustomizeClick: () -> Unit) {
         else -> "🏎️ Speed Racer"
     }
 
+    // Mute state hoisted so it's accessible in the overlay
+    var isMuted by remember { mutableStateOf(AudioManager.isMuted()) }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Brush.verticalGradient(listOf(Color(0xFF1A237E), Color(0xFF0D47A1)))),
-        contentAlignment = Alignment.Center
+            .background(Brush.verticalGradient(listOf(Color(0xFF1A237E), Color(0xFF0D47A1))))
     ) {
+        // Volume toggle – top-end corner
+        IconButton(
+            onClick = { isMuted = AudioManager.toggleMute() },
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(top = 40.dp, end = 16.dp)
+        ) {
+            Text(if (isMuted) "🔇" else "🔊", fontSize = 28.sp)
+        }
+
+        // Main content – centred
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 24.dp),
+                .padding(horizontal = 24.dp)
+                .align(Alignment.Center),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
@@ -56,7 +71,7 @@ fun HomeScreen(onPlayClick: () -> Unit, onCustomizeClick: () -> Unit) {
                 textAlign = TextAlign.Center,
                 modifier = Modifier.fillMaxWidth()
             )
-        
+
             Spacer(modifier = Modifier.height(8.dp))
             Text(
                 text = "BEST SCORE: ${highScore.toInt()}m",
@@ -80,45 +95,57 @@ fun HomeScreen(onPlayClick: () -> Unit, onCustomizeClick: () -> Unit) {
             }
 
             Spacer(modifier = Modifier.height(44.dp))
-            
+
+            // Primary CTA
             Button(
                 onClick = {
                     AudioManager.playSfx(context, "button")
                     onPlayClick()
                 },
-                modifier = Modifier.width(230.dp).height(64.dp),
+                modifier = Modifier.fillMaxWidth().height(64.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = Color.White),
                 shape = RoundedCornerShape(18.dp)
             ) {
                 Text("START RUN", fontSize = 22.sp, color = Color(0xFF1A237E), fontWeight = FontWeight.Black)
             }
-            
+
             Spacer(modifier = Modifier.height(16.dp))
-            
-            OutlinedButton(
-                onClick = {
-                    AudioManager.playSfx(context, "button")
-                    onCustomizeClick()
-                },
-                modifier = Modifier.width(230.dp).height(58.dp),
-                colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.White),
-                border = androidx.compose.foundation.BorderStroke(1.5.dp, Color.White.copy(alpha = 0.7f)),
-                shape = RoundedCornerShape(18.dp)
+
+            // Two-column row: GARAGE & SHOP | HOW TO PLAY
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                Text("GARAGE & SHOP", fontSize = 15.sp, fontWeight = FontWeight.Bold)
+                OutlinedButton(
+                    onClick = {
+                        AudioManager.playSfx(context, "button")
+                        onCustomizeClick()
+                    },
+                    modifier = Modifier.weight(1f).height(58.dp),
+                    colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.White),
+                    border = androidx.compose.foundation.BorderStroke(1.5.dp, Color.White.copy(alpha = 0.7f)),
+                    shape = RoundedCornerShape(18.dp)
+                ) {
+                    Text("GARAGE & SHOP", fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                }
+
+                OutlinedButton(
+                    onClick = {
+                        AudioManager.playSfx(context, "button")
+                        showTutorial = true
+                    },
+                    modifier = Modifier.weight(1f).height(58.dp),
+                    colors = ButtonDefaults.outlinedButtonColors(contentColor = Color(0xFFFFD600)),
+                    border = androidx.compose.foundation.BorderStroke(1.5.dp, Color(0xFFFFD600).copy(alpha = 0.5f)),
+                    shape = RoundedCornerShape(18.dp)
+                ) {
+                    Text("HOW TO PLAY 📖", fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                }
             }
 
-            Spacer(modifier = Modifier.height(6.dp))
-            Text(
-                text = "💰 $coins coins",
-                fontSize = 13.sp,
-                fontWeight = FontWeight.SemiBold,
-                color = Color(0xFFFFD700)
-            )
+            Spacer(modifier = Modifier.height(12.dp))
 
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Friends Leaderboard Button
+            // Leaderboard – full width
             OutlinedButton(
                 onClick = {
                     AudioManager.playSfx(context, "button")
@@ -126,7 +153,7 @@ fun HomeScreen(onPlayClick: () -> Unit, onCustomizeClick: () -> Unit) {
                         PlayGamesManager.showLeaderboard(activity)
                     }
                 },
-                modifier = Modifier.width(230.dp).height(52.dp),
+                modifier = Modifier.fillMaxWidth().height(52.dp),
                 colors = ButtonDefaults.outlinedButtonColors(
                     contentColor = if (isSignedIn) Color(0xFF00E5FF) else Color.White.copy(alpha = 0.55f)
                 ),
@@ -150,13 +177,14 @@ fun HomeScreen(onPlayClick: () -> Unit, onCustomizeClick: () -> Unit) {
                     )
                 }
             }
-            
-            Spacer(modifier = Modifier.height(24.dp))
-            
-            var isMuted by remember { mutableStateOf(AudioManager.isMuted()) }
-            IconButton(onClick = { isMuted = AudioManager.toggleMute() }) {
-                Text(if (isMuted) "🔈" else "🔊", fontSize = 32.sp, color = Color.White)
-            }
+        }
+
+        // Tutorial Overlay (replayable from Home)
+        if (showTutorial) {
+            TutorialOverlay(
+                onComplete = { showTutorial = false },
+                onSkip = { showTutorial = false }
+            )
         }
     }
 }

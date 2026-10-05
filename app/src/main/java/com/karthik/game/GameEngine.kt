@@ -263,11 +263,24 @@ class GameEngine(private val saveManager: SaveManager? = null, context: android.
                 onVibrate?.invoke("heavy")
 
                 // Trigger Police Chase & Wanted Level!
-                wantedLevel = (wantedLevel + 1).coerceAtMost(3)
-                policeChaseActive = true
-                policeChaseTimer = 6.0f
-                policeCarYOffset = -380f
-                onPlaySfx?.invoke("siren")
+                if (!policeChaseActive) {
+                    wantedLevel = 1
+                    policeChaseActive = true
+                    policeChaseTimer = 6.0f
+                    policeCarYOffset = -380f
+                    onPlaySfx?.invoke("siren")
+                } else {
+                    // Continuous hits while chase is already active
+                    if (wantedLevel < 3) {
+                        wantedLevel++
+                        // Police surge forward closer to player
+                        policeCarYOffset = (policeCarYOffset + 120f).coerceAtMost(-120f)
+                        onPlaySfx?.invoke("siren")
+                    } else {
+                        // Continuous hits at max Wanted Level (Level 3): Police catch & bust the player immediately!
+                        policeCarYOffset = -90f
+                    }
+                }
             }
 
             // Pedestrian Close Call (Near Miss on Sidewalk)
@@ -307,8 +320,13 @@ class GameEngine(private val saveManager: SaveManager? = null, context: android.
                     onVibrate?.invoke("double")
                 }
             } else {
-                // Police gaining ground!
-                policeCarYOffset = lerp(policeCarYOffset, -90f, 0.035f)
+                // Police gaining ground! Catch speed scales with wanted level.
+                val catchSpeed = when (wantedLevel) {
+                    3 -> 0.065f // Hardest chase: police gain ground fast!
+                    2 -> 0.050f // Medium chase
+                    else -> 0.035f // Level 1 chase
+                }
+                policeCarYOffset = lerp(policeCarYOffset, -90f, catchSpeed)
                 policeChaseTimer -= deltaTime
                 if (policeChaseTimer <= 0f || policeCarYOffset >= -100f) {
                     // POLICE BUSTED!
